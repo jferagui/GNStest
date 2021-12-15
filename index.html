@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+    <title>Biblioteca Escolar</title>
+    <script>
+    var contador=1;
+    var total;
+    var texto;
+
+
+    function paginar() {
+        contador = contador + 1;
+
+    }
+
+    function despaginar() {
+
+      if(contador>=2){
+        contador = contador - 1;
+      }else{
+        contador = 1;
+      }
+
+
+    }
+    </script>
+
+    <style>
+
+
+        body{
+            background-color: #BAB7B7;
+            color: white;
+
+        }
+        table thead{
+            background-color: #302b63;
+            color: white;
+        }
+        .pagination{
+            width: 90%;
+            margin-left: auto;
+            margin-right: auto;
+            margin-bottom: 50px;
+        }
+        .modalContainer {
+			display: none;
+			position: fixed;
+			z-index: 1;
+			padding-top: 100px;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			overflow: auto;
+      color: black;
+			background-color: rgb(0,0,0);
+			background-color: rgba(0,0,0,0.4);
+		}
+
+		.modalContainer .modal-content {
+			background-color: #fefefe;
+			margin: auto;
+			padding: 20px;
+			border: 1px solid lightgray;
+			border-top: 10px solid #58abb7;
+			width: 60%;
+		}
+
+		.modalContainer .close {
+			color: #aaaaaa;
+			float: right;
+			font-size: 28px;
+			font-weight: bold;
+		}
+
+		.modalContainer .close:hover,
+		.modalContainer .close:focus {
+			color: #000;
+			text-decoration: none;
+			cursor: pointer;
+		}
+
+        }
+    </style>
+  </head>
+  <body>
+    <h1>BIBLIOTECA ESCOLAR</h1>
+    <form class="container mt-4">
+        <input type="text" id="domTextElemente">
+        <button type="button" onclick="getValueInput()">
+            Buscar
+        </button>
+        <p id="valueInput"></p>
+    </form>
+    <div class="container mt-4 shadow-lg pe mb-5 bg-body rounded">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Subtitle</th>
+                    <th>Isbn13</th>
+                    <th>Price</th>
+                    <th>Url</th>
+                </tr>
+            </thead>
+            <tbody id="dataTable">
+            </tbody>
+        </table>
+    </div>
+    <nav class = "pagination">
+        <ul class="pagination">
+          <li id="previous" class="page-item"><a class="page-link" onclick="getValueInputDPag()">Previous</a></li>
+          <li id="next" class="page-item"><a class="page-link" onclick="getValueInputPag()">Next</a></li>
+          <div class="page-link" id="paginas">
+
+          </div>
+
+        </ul>
+      </nav>
+    <div class="d-flex justify-content-center">
+        <div id = "spinner" class="spinner-border text-danger" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+      <div id="myModal" class="modalContainer">
+         <div class="modal-content">
+         <span class="close">×</span> <h2>Imagen del Libro</h2>
+         <p></p> </div>
+         <div class="modal-content" id="imagen">
+           <img src="" id="img" alt="" />
+         </div>
+       </div>
+    <script! src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+
+
+    <script>
+        const spinner = document.querySelector("#spinner")
+        var paginas = document.querySelector("#paginas")
+        var imagen = document.querySelector("#imagen")
+        const getValueInput = () =>{
+
+          contador = 1;
+          let url = 'https://api.itbook.store/1.0/search/';
+          texto =  document.getElementById("domTextElemente").value;
+          url = url+texto;
+          console.log(url);
+            fetch(url)
+            .then(response => response.json())
+            .then(data => viewData(data.books))
+            .catch(error => console.log(error))
+            //.$template = "",
+            //.$prevLink,
+            //.$nextLink,
+            getDatos();
+            //console.log(total);
+            return true
+
+        }
+        const getDatos = () =>{
+
+          //contador = 1;
+          let url = 'https://api.itbook.store/1.0/search/';
+          //texto =  document.getElementById("domTextElemente").value;
+          url = url+texto;
+          fetch(url)
+          .then(response => response.json())
+          .then(dat => {console.log(dat.total);
+            paginas.innerHTML = `
+                <label >Página ${contador} - Total Registros:  ${dat.total}</label>
+            `
+          })
+          .catch(error => console.log(error))
+            //console.log(json.total);
+            return true
+        }
+        const getValueInputPag = () =>{
+          paginar();
+          console.log(contador);
+
+          let url2 = 'https://api.itbook.store/1.0/search/';
+          //stexto =  document.getElementById("domTextElemente").value
+          url2 = url2+texto+'/'+contador;
+          console.log(texto);
+          console.log(url2);
+            fetch(url2)
+            .then(response => response.json())
+            .then(data => viewData(data.books))
+            .catch(error => console.log(error))
+            getDatos();
+            return true
+        }
+
+        const getValueInputDPag = () =>{
+          despaginar();
+          console.log(contador);
+
+          let url2 = 'https://api.itbook.store/1.0/search/';
+          //stexto =  document.getElementById("domTextElemente").value
+          url2 = url2+texto+'/'+contador;
+          console.log(texto);
+          console.log(url2);
+            fetch(url2)
+            .then(response => response.json())
+            .then(data => viewData(data.books))
+            .catch(error => console.log(error))
+            getDatos();
+            return true
+        }
+
+         const viewData = (data) => {
+           spinner.style.display = "none";
+            let body = ''
+            console.log(data);
+            //let cant = data.total;
+            //console.log(data.count);
+           for (let i = 0; i < data.length; i++) {
+
+                body += `<tr><td data-id="${data[i].image}" style="cursor:pointer" onclick="ModalDesplegar()">${data[i].title}</td>
+                    <td>${data[i].subtitle}</td>
+                    <td>${data[i].isbn13}</td>
+                    <td>${data[i].price}</td>
+                    <td>${data[i].url}</td></tr>`
+                    console.log(data[i].image);
+            }
+
+            document.getElementById('dataTable').innerHTML = body
+        }
+        var books
+        var page
+
+        function ModalDesplegar() {
+			var modal = document.getElementById("myModal");
+			//var btn = document.getElementById("btnModal");
+			var span = document.getElementsByClassName("close")[0];
+			var body = document.getElementsByTagName("body")[0];
+      //$('img').src($(this).data('id'));
+      var getimg = $(event.target).closest('td').data('id');
+      document.getElementById("img").src=""+getimg;
+
+				modal.style.display = "block";
+
+				body.style.position = "static";
+				body.style.height = "100%";
+				body.style.overflow = "hidden";
+        body.style.Colors = "black";
+
+			span.onclick = function() {
+				modal.style.display = "none";
+
+				body.style.position = "inherit";
+				body.style.height = "auto";
+				body.style.overflow = "visible";
+			}
+
+			window.onclick = function(event) {
+				if (event.target == modal) {
+					modal.style.display = "none";
+
+					body.style.position = "inherit";
+					body.style.height = "auto";
+					body.style.overflow = "visible";
+				}
+			}
+		}
+
+
+
+    </script>
+
+
+  </body>
+</html>
